@@ -6,6 +6,7 @@ import AnswerPage from "./pages/AnswerPage.jsx";
 // import { AuthProvider } from "./context/AuthContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import React from "react";
+import Editor from "./components/Editor/Editor.jsx"
 
 function App() {
   return (
