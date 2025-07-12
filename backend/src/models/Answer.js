@@ -1,3 +1,6 @@
+import mongoose from "mongoose"
+
+
 const AnswerSchema = new mongoose.Schema(
   {
     question: {
@@ -28,4 +31,4 @@ const AnswerSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Answer", AnswerSchema);
+export default mongoose.model("Answer", AnswerSchema);

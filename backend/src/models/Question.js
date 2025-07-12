@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"
 
 const QuestionSchema = new mongoose.Schema(
   {
@@ -35,3 +35,5 @@ const QuestionSchema = new mongoose.Schema(
     timestamp: true,
   }
 );
+
+export default mongoose.model("Question" , QuestionSchema)
