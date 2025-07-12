@@ -1,9 +1,9 @@
 // src/components/AuthPage.jsx
 import React, { useEffect, useRef } from 'react';
-import '../components/AuthPage.css';
-import { useAuth } from '../context/AuthContext';
-import SignInForm from '../components/SignInForm';
-import SignUpForm from '../components/SignUpForm';
+import '../components/Authentication/AuthPage.css';
+import { useAuth } from "../context/AuthContext.jsx";
+import SignInForm from "../components/Authentication/SignInForm.jsx";
+import SignUpForm from "../components/Authentication/SignUpForm.jsx";
 
 const AuthPage = () => {
   const { isSignIn, toggleAuthMode } = useAuth();
