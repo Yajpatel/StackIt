@@ -1,12 +1,9 @@
 /* src/index.css */
-<<<<<<< HEAD
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
-=======
 @import '../@/styles/_keyframe-animations.scss';
 @import '../@/styles/_variables.scss';
 @import "tailwindcss";
 /* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap'); */
->>>>>>> 1093951f4b0633c233adf45edd51a822823a8111
 
 :root {
   --primary-color: #4EA685;
