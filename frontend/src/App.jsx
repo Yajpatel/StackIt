@@ -12,10 +12,9 @@ import Editor from "./components/Editor/Editor.jsx"
 
 function App() {
   return (
-     <BrowserRouter>
-     
+    // <Editor content={""}></Editor>
+    <BrowserRouter>
     <AuthProvider>
-
       <div className="App">
         <Routes>
          <Route path="/" element={<HomePage />} />
