@@ -6,7 +6,7 @@ import SignInForm from "../components/Authentication/SignInForm.jsx";
 import SignUpForm from "../components/Authentication/SignUpForm.jsx";
 
 const AuthPage = () => {
-  const { isSignIn, toggleAuthMode } = useAuth();
+  const { isSignIn } = useAuth();
   const containerRef = useRef();
 
   useEffect(() => {
