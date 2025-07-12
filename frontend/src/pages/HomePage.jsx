@@ -17,7 +17,7 @@ const HomePage = () => {
           <button>More ▾</button>
           <input type="text" placeholder="Search" />
           <button>🔍</button>
-          <Link to="/login">
+          <Link to="/auth">
             <button>Login</button>
           </Link>
         </div>
