@@ -1,6 +1,6 @@
 // src/components/SignUpForm.jsx
 import React from "react";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const SignUpForm = () => {
   const { toggleAuthMode } = useAuth();
