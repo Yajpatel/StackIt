@@ -15,14 +15,20 @@ const QuestionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    tags: [{ type: String }],
+    tags: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag",
+        required: true,
+      },
+    ],
     votes: {
       type: Number,
       default: 0,
     },
     acceptedAnswer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Answer"
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Answer",
     },
   },
   {
