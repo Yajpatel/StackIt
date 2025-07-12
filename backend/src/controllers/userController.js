@@ -9,6 +9,11 @@ import User from "../models/User.js"
 
 export const signup = async (req, res) => {
   const { username, email, password } = req.body;
+
+  if(!username || !email || !password){
+      return res.status(httpStatus.BAD_REQUEST).json({ msg: "provide Every Info" });
+  }
+
   try {
     const existinguser = await User.findOne({ username });
     if (existinguser) {
@@ -37,6 +42,10 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
+  if(!username || !password){
+      return res.status(httpStatus.BAD_REQUEST).json({ msg: "provide Every Info" });
+  }
+
   try {
     // 🛠 Fix: find by email
     const existinguser = await User.findOne({ username });
