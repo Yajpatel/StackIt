@@ -21,6 +21,7 @@ const SignInForm = () => {
   };
 
   return (
+    <form action="" method="POST">
     <div className="form sign-in">
       <div className="input-group">
         <i className="bx bxs-user"></i>
@@ -53,6 +54,7 @@ const SignInForm = () => {
         </b>
       </p>
     </div>
+    </form>
   );
 };
 

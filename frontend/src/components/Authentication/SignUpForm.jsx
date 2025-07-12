@@ -32,6 +32,7 @@ const SignUpForm = () => {
   };
 
   return (
+    <form action="" method="POST">
     <div className="form sign-up">
       <div className="input-group">
         <i className="bx bxs-user"></i>
@@ -81,6 +82,7 @@ const SignUpForm = () => {
         </b>
       </p>
     </div>
+    </form>
   );
 };
 
