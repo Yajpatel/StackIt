@@ -1,59 +1,105 @@
 .ask-container {
-  background-color: #fefefe;
-  padding: 30px;
-  font-family: "Segoe UI", sans-serif;
   min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 2rem 1rem;
 }
 
-.ask-container header {
-  background-color: #24292f;
-  color: white;
-  padding: 15px 25px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.ask-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.ask-container nav {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.ask-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
-form {
-  margin-top: 40px;
-  max-width: 800px;
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-}
-
-form label {
+.ask-form label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #374151;
   display: block;
-  font-weight: bold;
-  margin-bottom: 6px;
-  margin-top: 20px;
 }
 
-form input,
-form textarea {
+.ask-input,
+.ask-textarea {
   width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  margin-bottom: 10px;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  transition: 0.3s border-color;
 }
 
-form button {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 25px;
+.ask-input:focus,
+.ask-textarea:focus {
+  border-color: #3b82f6;
+}
+
+.ask-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.tag-button {
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+  border-radius: 9999px;
+  margin: 0.2rem;
   cursor: pointer;
-  margin-top: 15px;
+  transition: all 0.2s;
+}
+
+.tag-button.selected {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.tag-button:not(.selected) {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.ask-submit {
+  background-color: #3b82f6;
+  color: white;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.ask-submit:hover {
+  background-color: #2563eb;
+}
+
+.ask-message {
+  text-align: center;
+  font-size: 0.875rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 8px;
+}
+
+.ask-message.success {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.ask-message.error {
+  background-color: #fee2e2;
+  color: #b91c1c;
 }

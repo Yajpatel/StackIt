@@ -1,49 +1,36 @@
 // src/components/AuthPage.jsx
-import React, { useEffect, useRef } from 'react';
-import '../components/Authentication/AuthPage.css';
-import { useAuth } from "../context/AuthContext.jsx";
-import SignInForm from "../components/Authentication/SignInForm.jsx";
-import SignUpForm from "../components/Authentication/SignUpForm.jsx";
+import React, { useState } from 'react';
+import SignInForm from '../components/Authentication/SignInForm';
+import SignUpForm from '../components/Authentication/SignUpForm';
+import './AuthPage.css';
 
 const AuthPage = () => {
-  const { isSignIn } = useAuth();
-  const containerRef = useRef();
-
-  useEffect(() => {
-    containerRef.current.classList.add('sign-in');
-  }, []);
-
-  useEffect(() => {
-    containerRef.current.classList.toggle('sign-in', isSignIn);
-    containerRef.current.classList.toggle('sign-up', !isSignIn);
-  }, [isSignIn]);
+  const [activeTab, setActiveTab] = useState('login');
 
   return (
-    <div ref={containerRef} id="container" className="container">
-      <div className="row">
-        <div className="col align-items-center flex-col sign-up">
-          <div className="form-wrapper align-items-center">
-            <SignUpForm />
-          </div>
+    <div className="auth-container">
+      <div className="auth-form">
+        <div className="auth-tabs">
+          <button
+            className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`}
+            onClick={() => setActiveTab('login')}
+          >
+            Sign In
+          </button>
+          <button
+            className={`auth-tab ${activeTab === 'signup' ? 'active' : ''}`}
+            onClick={() => setActiveTab('signup')}
+          >
+            Sign Up
+          </button>
         </div>
-        <div className="col align-items-center flex-col sign-in">
-          <div className="form-wrapper align-items-center">
-            <SignInForm />
+        
+        <div className="auth-content">
+          <div className={`auth-slide ${activeTab === 'login' ? 'slide-in' : 'slide-out'}`}>
+            {activeTab === 'login' && <SignInForm />}
           </div>
-        </div>
-      </div>
-
-      <div className="row content-row">
-        <div className="col align-items-center flex-col">
-          <div className="text sign-in">
-            <h2>Welcome</h2>
-          </div>
-          <div className="img sign-in"></div>
-        </div>
-        <div className="col align-items-center flex-col">
-          <div className="img sign-up"></div>
-          <div className="text sign-up">
-            <h2>Join with us</h2>
+          <div className={`auth-slide ${activeTab === 'signup' ? 'slide-in' : 'slide-out'}`}>
+            {activeTab === 'signup' && <SignUpForm />}
           </div>
         </div>
       </div>

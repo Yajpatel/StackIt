@@ -1,56 +1,133 @@
-import React from "react";
-import { Link } from "react-router-dom"; // ✅ Import Link
-import "./HomePage.css";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { questionsAPI } from '../utils/api';
+import './HomePage.css';
 
 const HomePage = () => {
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const fetchQuestions = async () => {
+    try {
+      setLoading(true);
+      const data = await questionsAPI.getAll();
+      console.log('Questions data:', data); // Debug log
+      setQuestions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError('Failed to load questions');
+      console.error('Error fetching questions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Unknown date';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="questions-list">
+        <div className="questions-header">
+          <h1>Loading Questions...</h1>
+          <div className="loading" style={{ margin: '2rem auto' }}></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="questions-list">
+        <div className="error">
+          <h2>Error Loading Questions</h2>
+          <p>{error}</p>
+          <button onClick={fetchQuestions} className="btn-primary">
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="home-container">
-      {/* Navigation */}
-      <header className="nav-bar">
-        <h1>StackIt</h1>
-        <div className="nav-actions">
-          <Link to="/AskQuestion">
-            <button>Ask New Question</button>
-          </Link>
-          <button>Newest</button>
-          <button>Unanswered</button>
-          <button>More ▾</button>
-          <input type="text" placeholder="Search" />
-          <button>🔍</button>
-          <Link to="/auth">
-            <button>Login</button>
+    <div className="questions-list">
+      <div className="questions-header">
+        <h1>Welcome to StackIt</h1>
+        <p>Discover answers to your questions and help others in the community</p>
+      </div>
+
+      {questions.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-icon">🤔</div>
+          <h2>No Questions Yet</h2>
+          <p>Be the first to ask a question and start the conversation!</p>
+          <Link to="/AskQuestion" className="btn-primary">
+            Ask Your First Question
           </Link>
         </div>
-      </header>
-
-      {/* Questions List */}
-      <div className="questions-list">
-        {[1, 2, 3].map((id, idx) => (
-          <Link to={`/answer/${id}`} key={id} style={{ textDecoration: "none", color: "inherit" }}>
-            <div className="question-card">
-              <div className="tags">
-                <span className="tag">Tag1</span>
-                <span className="tag">Tag2</span>
+      ) : (
+        <div className="questions-grid">
+          {questions.map((question) => (
+            <Link 
+              key={question._id} 
+              to={`/question/${question._id}`}
+              className="question-card"
+            >
+              <div className="question-meta">
+                <div className="question-author">
+                  <div className="author-avatar">
+                    {question.author?.username?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <span>{question.author?.username || 'Anonymous'}</span>
+                </div>
+                <span className="question-date">
+                  {formatDate(question.createdAt)}
+                </span>
               </div>
-              <div className="content">
-                <h3>How to join 2 columns in a data set to make a separate column in SQL</h3>
-                <p>I do not know the code for it as I am a beginner... (truncated)</p>
-                <small>User Name</small>
-              </div>
-              <div className="answer-count">{5 - idx} ans</div>
-            </div>
-          </Link>
-        ))}
-      </div>
 
-      {/* Pagination */}
-      <div className="pagination">
-        <span>{`<`}</span>
-        {[1, 2, 3, 4, 5, 6, 7].map((n) => (
-          <button key={n}>{n}</button>
-        ))}
-        <span>{`>`}</span>
-      </div>
+              <h3>{question.title || 'Untitled Question'}</h3>
+              <p>
+                {question.content 
+                  ? (question.content.length > 150 
+                      ? question.content.substring(0, 150) + '...' 
+                      : question.content)
+                  : 'No content available'
+                }
+              </p>
+
+              <div className="question-footer">
+                <div className="tags">
+                  {question.tags && Array.isArray(question.tags) && question.tags.map((tag) => (
+                    <span key={tag._id || tag} className="tag">
+                      {tag.name || tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="question-stats">
+                  <span className="answer-count">
+                    {question.answers?.length || 0} answers
+                  </span>
+                  <span className="vote-count">
+                    {question.votes || 0} votes
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

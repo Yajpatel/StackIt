@@ -1,62 +1,76 @@
-import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom"; // ✅ Step 1
+import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const SignInForm = () => {
-  const { toggleAuthMode, login } = useAuth();
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const navigate = useNavigate(); // ✅ Step 2
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // ✅ Prevent default form submission
-    const result = await login(formData);
-    if (result.success) {
-      toast.success(result.msg);
-      navigate("/"); // ✅ Redirect to homepage
-    } else {
-      toast.error(result.msg);
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await login(email, password);
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.error || 'Login failed');
+      }
+    } catch (err) {
+      setError('An error occurred during login');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} method="POST"> {/* ✅ Use onSubmit instead of onClick */}
-      <div className="form sign-in">
-        <div className="input-group">
-          <i className="bx bxs-user"></i>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <i className="bx bxs-lock-alt"></i>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
-        <button type="submit">Sign in</button> {/* ✅ type="submit" */}
-        <p>
-          <b>Forgot password?</b>
-        </p>
-        <p>
-          <span>Don't have an account?</span>
-          <b onClick={toggleAuthMode} className="pointer">
-            Sign up here
-          </b>
-        </p>
+    <form onSubmit={handleSubmit} className="auth-form-content">
+      <div className="form-group">
+        <label className="form-label">
+          Email
+        </label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="form-input"
+          required
+        />
       </div>
+
+      <div className="form-group">
+        <label className="form-label">
+          Password
+        </label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="form-input"
+          required
+        />
+      </div>
+
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="btn-primary"
+      >
+        {loading ? 'Signing In...' : 'Sign In'}
+      </button>
     </form>
   );
 };

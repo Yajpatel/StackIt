@@ -11,6 +11,10 @@ const QuestionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+    },
     body: {
       type: String,
       required: true,
@@ -26,13 +30,25 @@ const QuestionSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    votesBy: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        voteType: {
+          type: String,
+          enum: ["upvote", "downvote"],
+        },
+      },
+    ],
     acceptedAnswer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Answer",
     },
   },
   {
-    timestamp: true,
+    timestamps: true,
   }
 );
 

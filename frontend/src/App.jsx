@@ -1,31 +1,32 @@
-import {BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage.jsx";
-import AuthPage from "./pages/AuthPage.jsx";
-import AskQuestion from "./pages/AskQuestion.jsx";
-import AnswerPage from "./pages/AnswerPage.jsx";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-import { AuthProvider } from "./context/AuthContext.jsx";
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Navbar from "./components/UniversalComponent/Navbar";
+import Footer from "./components/UniversalComponent/Footer";
+import HomePage from "./pages/HomePage";
+import AskQuestion from "./pages/AskQuestion";
+import AuthPage from "./pages/AuthPage";
+import QuestionDetail from "./pages/QuestionDetail";
+import "./App.css";
 
 function App() {
   return (
-     <BrowserRouter>
-     
     <AuthProvider>
-
-      <div className="App">
-        <Routes>
-         <Route path="/" element={<HomePage />} />
-      <Route path="/auth" element={<AuthPage />} />
-          <Route path="/AskQuestion" element={<AskQuestion />} />
-          <Route path="/answer/:id" element={<AnswerPage />} />
-        </Routes>
-      </div>
-      <ToastContainer />
+      <Router>
+        <div className="App">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/AskQuestion" element={<AskQuestion />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/question/:id" element={<QuestionDetail />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
     </AuthProvider>
-    </BrowserRouter>
   );
 }
 

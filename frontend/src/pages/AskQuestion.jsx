@@ -1,60 +1,184 @@
-import React, { useState } from "react";
-import './AskQuestion.css'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { questionsAPI, tagsAPI } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+import './AskQuestion.css';
 const AskQuestion = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [tags, setTags] = useState("");
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const questionData = {
-      title,
-      description,
-      tags: tags.split(",").map((tag) => tag.trim()),
-    };
-    console.log("Question Submitted:", questionData);
-    // TODO: Send to backend
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate('/auth');
+      return;
+    }
+    fetchTags();
+  }, [isAuthenticated, navigate]);
+
+  const fetchTags = async () => {
+    try {
+      const data = await tagsAPI.getAll();
+      setTags(data);
+    } catch (err) {
+      console.error('Error fetching tags:', err);
+    }
   };
 
+  const handleTagToggle = (tagId) => {
+    setSelectedTags(prev => 
+      prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    if (!title.trim() || !content.trim()) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const questionData = {
+        title: title.trim(),
+        content: content.trim(),
+        tags: selectedTags
+      };
+
+      const result = await questionsAPI.create(questionData);
+      
+      if (result._id) {
+        setSuccess('Question posted successfully!');
+        setTimeout(() => {
+          navigate(`/question/${result._id}`);
+        }, 1500);
+      } else {
+        setError(result.message || 'Failed to post question');
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred while posting your question');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isAuthenticated()) {
+    return null;
+  }
+
   return (
-    <div className="ask-container" style={{ padding: "20px" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>StackIt</h1>
-        <nav style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-          <a href="/">Home</a>
-          <span>🔔</span>
-          <img src="https://via.placeholder.com/30" alt="Profile" style={{ borderRadius: "50%" }} />
-        </nav>
-      </header>
+    <div className="form-container">
+      <div className="form-header">
+        <h2>Ask a Question</h2>
+        <p>Share your knowledge and get help from the community</p>
+      </div>
 
-      <form onSubmit={handleSubmit} style={{ marginTop: "30px", maxWidth: "700px" }}>
-        <label>Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter your question title"
-          style={{ width: "100%", padding: "8px", marginBottom: "20px" }}
-        />
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="title" className="form-label">
+            Question Title *
+          </label>
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="form-input"
+            placeholder="What's your question? Be specific."
+            required
+            maxLength={200}
+          />
+          <small className="form-help">
+            {title.length}/200 characters
+          </small>
+        </div>
 
-        <label>Description</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Write your question in detail..."
-          style={{ width: "100%", height: "200px", padding: "10px", marginBottom: "20px" }}
-        ></textarea>
+        <div className="form-group">
+          <label htmlFor="content" className="form-label">
+            Question Details *
+          </label>
+          <textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="form-input"
+            placeholder="Provide more context about your question. Include any relevant code, error messages, or specific details that will help others understand and answer your question."
+            required
+            rows={8}
+          />
+        </div>
 
-        <label>Tags (comma separated)</label>
-        <input
-          type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder="e.g. SQL, joins, beginners"
-          style={{ width: "100%", padding: "8px", marginBottom: "20px" }}
-        />
+        <div className="form-group">
+          <label className="form-label">
+            Tags (Optional)
+          </label>
+          <div className="tags-container">
+            {tags.map((tag) => (
+              <button
+                key={tag._id}
+                type="button"
+                className={`tag-selector ${selectedTags.includes(tag._id) ? 'selected' : ''}`}
+                onClick={() => handleTagToggle(tag._id)}
+              >
+                {tag.name}
+                {selectedTags.includes(tag._id) && <span className="tag-check">✓</span>}
+              </button>
+            ))}
+          </div>
+          <small className="form-help">
+            Select relevant tags to help others find your question
+          </small>
+        </div>
 
-        <button type="submit" style={{ padding: "10px 20px", cursor: "pointer" }}>Submit</button>
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="success-message">
+            {success}
+          </div>
+        )}
+
+        <div className="form-actions">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="btn-secondary"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary"
+          >
+            {loading ? (
+              <>
+                <span className="loading"></span>
+                Posting Question...
+              </>
+            ) : (
+              'Post Question'
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

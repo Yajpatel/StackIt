@@ -1,94 +1,111 @@
 // src/components/SignUpForm.jsx
-import React, { useState } from "react";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom"; // ✅ Step 1
+import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpForm = () => {
-  const { toggleAuthMode, register } = useAuth();
-  const navigate = useNavigate(); // ✅ Step 2
-
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // ✅ Prevent default form behavior
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
-    const { confirmPassword, ...signupData } = formData;
-    const result = await register(signupData);
-
-    if (result.success) {
-      toast.success(result.msg);
-      console.log("Navigating to home...");
-      navigate("/");
-    } else {
-      toast.error(result.msg);
+    try {
+      const result = await signup(username, email, password);
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.error || 'Signup failed');
+      }
+    } catch (err) {
+      setError('An error occurred during signup');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} method="POST"> {/* ✅ onSubmit instead of onClick */}
-      <div className="form sign-up">
-        <div className="input-group">
-          <i className="bx bxs-user"></i>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <i className="bx bx-mail-send"></i>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <i className="bx bxs-lock-alt"></i>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="input-group">
-          <i className="bx bxs-lock-alt"></i>
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-        </div>
-        <button type="submit">Sign up</button> {/* ✅ type="submit" */}
-        <p>
-          <span>Already have an account?</span>
-          <b onClick={toggleAuthMode} className="pointer">
-            Sign in here
-          </b>
-        </p>
+    <form onSubmit={handleSubmit} className="auth-form-content">
+      <div className="form-group">
+        <label className="form-label">
+          Username
+        </label>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="form-input"
+          required
+        />
       </div>
+
+      <div className="form-group">
+        <label className="form-label">
+          Email
+        </label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="form-input"
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">
+          Password
+        </label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="form-input"
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">
+          Confirm Password
+        </label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="form-input"
+          required
+        />
+      </div>
+
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="btn-primary"
+      >
+        {loading ? 'Creating Account...' : 'Sign Up'}
+      </button>
     </form>
   );
 };

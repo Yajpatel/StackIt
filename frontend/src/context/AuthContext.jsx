@@ -1,53 +1,104 @@
 // src/context/AuthContext.jsx
-import React,{ createContext, useState, useContext } from 'react';
-import axios from 'axios';
-
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { usersAPI } from '../utils/api';
 
 const AuthContext = createContext();
 
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
 export const AuthProvider = ({ children }) => {
-  const [isSignIn, setIsSignIn] = useState(true);
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const api = axios.create({
-    baseURL:"http://localhost:5000"
-  })
+  useEffect(() => {
+    // Check if user is logged in from localStorage
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setLoading(false);
+  }, []);
 
-  const toggleAuthMode = () => setIsSignIn(prev => !prev);
-
-  const register = async (formData) => {
+  const login = async (email, password) => {
     try {
-      const res = await api.post('/user/register', formData);
-      setUser(res.data.result);
-      setToken(res.data.token);
-      return { success: true, msg: res.data.msg };
-    } catch (err) {
-      return { success: false, msg: err.response?.data?.msg || 'Signup failed' };
+      const response = await usersAPI.login({ email, password });
+      
+      if (response.user && response.token) {
+        const userData = {
+          id: response.user._id,
+          username: response.user.username,
+          email: response.user.email,
+          role: response.user.role,
+          token: response.token
+        };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        return { success: true };
+      } else {
+        return { success: false, error: response.message || 'Login failed' };
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: error.message || 'Login failed' };
     }
   };
 
-  const login = async (formData) => {
+  const signup = async (username, email, password) => {
     try {
-      const res = await api.post('/user/login', formData);
-      setUser(res.data.result);
-      setToken(res.data.token);
-      return { success: true, msg: 'Login successful' };
-    } catch (err) {
-      return { success: false, msg: err.response?.data?.msg || 'Login failed' };
+      const response = await usersAPI.register({ username, email, password });
+      
+      if (response.user && response.token) {
+        const userData = {
+          id: response.user._id,
+          username: response.user.username,
+          email: response.user.email,
+          role: response.user.role,
+          token: response.token
+        };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        return { success: true };
+      } else {
+        return { success: false, error: response.message || 'Signup failed' };
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      return { success: false, error: error.message || 'Signup failed' };
     }
   };
 
   const logout = () => {
     setUser(null);
-    setToken(null);
+    localStorage.removeItem('user');
+  };
+
+  const isAuthenticated = () => {
+    return user !== null;
+  };
+
+  const isAdmin = () => {
+    return user && user.role === 'admin';
+  };
+
+  const value = {
+    user,
+    login,
+    signup,
+    logout,
+    isAuthenticated,
+    isAdmin,
+    loading
   };
 
   return (
-    <AuthContext.Provider value={{ isSignIn, toggleAuthMode, user, token, register, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);
